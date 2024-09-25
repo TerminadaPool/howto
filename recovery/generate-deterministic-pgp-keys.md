@@ -7,9 +7,9 @@ Follow [Air gapped raspberry pi](<air-gapped-raspberry-pi.md>) instructions.  On
 
 ## Do all the following on an air-gapped machine
 
-Note:  You will need to type every command in manually at the keyboard.  You will not be able to cut and paste anything into the terminal because the raspberry pi is air-gapped.  You must not circumvent the air-gap, so please don't connect any network cables or try to configure wifi.
+Note:  You will need to type every command at the keyboard.  You will not be able to cut and paste anything into the terminal because the raspberry pi is air-gapped.  You must not circumvent the air-gap, so please don't connect any network cables or try to configure wifi.
 
-All required software should already reside on the air-gapped machine.  Power up this machine.
+All required software should already reside on the air-gapped machine.  Power up this machine with the SD card inserted and continue.
 
 
 ## 1. Confirm that /home directory resides on tmpfs filesystem and there is no swap
@@ -30,7 +30,7 @@ date
 ```
 >Mon 23 Sep 2024 22:49:03 CEST
 
-If the timezone is incorrect then you can set this by simply symlinking to the correct zone.  Eg: ```sudo ln -sf /usr/share/zoneinfo/<country>/<city> /etc/localtime```
+If the timezone is incorrect then you can set this by either symlinking to the correct zone.  Eg: ```sudo ln -sf /usr/share/zoneinfo/<country>/<city> /etc/localtime``` or by using command: ```sudo dpkg-reconfigure tzdata```
 
 
 ## 3. Generate PGP secret keys

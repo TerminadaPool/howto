@@ -2,7 +2,7 @@
 
 Requirements:
 - SD card with at least 16G capacity
-- Raspberry pi: Suggest model 4B or 5.  (These instructions were confirmed to work on a Raspberry pi model 4B device.)
+- Raspberry pi: Suggest model 4B or 5.  (These instructions were confirmed to work on both Raspberry pi model 4B and Raspberry pi 5 devices.)
 
 
 ## 1. Install debootstrap and qemu-system-arm to host machine
@@ -218,7 +218,7 @@ update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100; \
 update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100;
 ```
 
-#### Chown /usr/local/src to pi user, clone required sources, build, and install
+#### Chown /usr/local/src to pi user, clone, build and install requirements
 ```
 chown -R pi:pi /usr/local/src; \
 
@@ -258,7 +258,7 @@ cp -v generate_derived_key/generate_derived_key /usr/local/bin/; \
 cp -v extend_key_expiry/extend_key_expiry /usr/local/bin/;
 ```
 
-#### Install script that can generate random bip39 words using openssl rand function
+#### Script to generate random bip39 words using openssl rand function
 ```
 cat << 'END_random_bip39_words' > /usr/local/bin/random-bip39-words;
 #!/bin/bash
