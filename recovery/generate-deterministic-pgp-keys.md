@@ -161,11 +161,33 @@ The forcesig setting of 'not forced' enables the gpg-agent to cache and re-use t
 
 Note: You can also configure gpg-agent with a line "Confirm: yes" to make gpg request authorisation of key use every time by clicking a desktop notification.
 
-### 7.4 Quit interactive session
-End of initial Gnuk token configuration
+### 7.4 List card settings, then quit
 ```
+gpg/card> list
+
 gpg/card> quit
 ```
+>Reader ...........: 234B:0000:FSIJ-2.2-3931CF92:0
+>Application ID ...: D276000124010200FFFE3931CF920000
+>Application type .: OpenPGP
+>Version ..........: 2.0
+>Manufacturer .....: unmanaged S/N range
+>Serial number ....: 3931CF92
+>Name of cardholder: [not set]
+>Language prefs ...: [not set]
+>Salutation .......: 
+>URL of public key : [not set]
+>Login data .......: user
+>Signature PIN ....: not forced
+>Key attributes ...: ed25519 cv25519 ed25519
+>Max. PIN lengths .: 127 127 127
+>PIN retry counter : 3 3 3
+>Signature counter : 0
+>KDF setting ......: single
+>Signature key ....: [none]
+>Encryption key....: [none]
+>Authentication key: [none]
+>General key info..: [none]
 
 
 ## 8. Send secret subkeys to Gnuk token
@@ -274,9 +296,8 @@ Note: You will be asked first for the user PIN.  Enter the factory default of '1
 
 Then enter your new passphrase.  It can be anything you like - all letters, numbers, spaces, and punctuation characters are available.
 
-Then select save or quit to exit from 'card-edit' mode.
+Then quit to exit from 'card-edit' mode.
 ```
-Your selection? Q
 gpg/card> quit
 ```
 
@@ -314,20 +335,16 @@ You only need to do this again if you extended the expiry of your key or generat
 
 Obtain a copy of the public key from the air-gapped machine by accessing the SD card in your PC and copying it over.  Then import the public key into your localPC gnupg instance: ```gpg --import name@domain.com-public.key```
 
-Now send the public key to the default keyserver:
+Now send the public key to openpgp.org keyserver:
 ```
-gpg --send-keys 0xblahblah_my_keyid_blahblah
-```
-
-Or send it to a specific keyserver:
-```
-$ gpg --keyserver pool.sks-keyservers.net --send-key 0xblahblah_my_keyid_blahblah
+gpg --export name@domain.com | curl -T - https://keys.openpgp.org
 ```
 
-Now check that you can download your public key from the keyservers:
+At any time you can export your public key to a file and upload that file at: https://keys.openpgp.org/upload
 ```
-$ gpg --recv-key 0xblahblah_my_keyid_blahblah
+gpg --export --armour name@domain.com > name@domain.com-public.key
 ```
+You can also upload this file to the pgp.mid.edu keyserver at: https://pgp.mit.edu/
 
 
 ## References:
@@ -344,6 +361,65 @@ $ gpg --recv-key 0xblahblah_my_keyid_blahblah
 ### Script to generate a random 24 word seed phrase using openssl rand (on the air-gapped machine)
 When generating a new PGP key, the generate_derived_key program suggests to randomly generate a 24 word seed phrase by rolling a 6 sided dice 100 times and entering each roll result.  However, depending on your level of paranoia, you might consider the bash script using the openssl rand utility to generate 24 random bip-39 seed words installed at: /usr/local/bin/random-bip39-words
 
+### Determine the USB device of the Gnuk token
+All Gnuk tokens (FST-01, FST-01G, FST-01SZ) have idVendor='234b'.  The following script is installed at /usr/local/usb-device-by:
+```
+#!/bin/bash
+set -euo pipefail
+
+[[ "${1:-}" =~ ^[0-9a-fA-F]+$ ]] || { printf "Error: invalid vendor ID '%s'\n" "${1:-}"; exit 1; }
+
+for d in /sys/bus/usb/devices/*; do
+  if [ "$1" == "$(cat "${d}/idVendor" 2>/dev/null)" ]; then
+    busnum="$(cat "${d}/busnum")"
+    devnum="$(cat "${d}/devnum")"
+    printf 'Device: /dev/bus/usb/%03i/%03i\n' "$busnum" "$devnum"
+  fi
+done
+```
+Use the script to find the USB device of Gnuk token (by vendor ID 234b):
+```
+usb-device-by 234b
+```
+> Device: /dev/bus/usb/001/003
+
+
+### Modify ACL permissions of Gnuk token USB device to give pi user rw access
+USB device first determined by using ```usb-device-by 234b```
+```
+sudo setfacl -m user:pi:rw- /dev/bus/usb/001/003
+```
+
+
+****
+## Troubleshooting
+****
+
+### OpenPGP card not available
+You inserted the USB Gnuk token but when trying to use the device with ```gpg --card-status``` you are seeing errors like:
+
+> gpg: selecting card failed: No such device
+> gpg: OpenPGP card not available: No such device
+
+Your user likely doesn't have read and write permissions on the USB device associated with Gnuk.
+
+You can check if root is able to access the Gnuk token:
+```
+sudo gpg --card-status
+```
+However, we don't want to do things such as edit the Gnuk token as the root user because we want gpg using the homedir of user pi which exists on the tmpfs (RAM) filesystem.
+
+Instead it is better to set the permissions of the Gnuk token USB device so that user pi can read and write to it:
+
+- First determine the USB device of the Gnuk token using the script at /usr/local/bin/usb-device-by:
+    ```
+    usb-device-by 234b
+    ```
+    > Device: /dev/bus/usb/001/003
+- Then use setfacl to give user pi read and write access:
+    ```
+    sudo setfacl -m user:pi:rw- /dev/bus/usb/001/003
+    ```
 
 
 
