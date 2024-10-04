@@ -28,7 +28,7 @@ sudo date --set '2024-09-23 22:49:00'
 
 date
 ```
->Mon 23 Sep 2024 22:49:03 CEST
+> Mon 23 Sep 2024 22:49:03 CEST  
 
 If the timezone is incorrect then you can set this by simply symlinking to the correct zone.  Eg: ```sudo ln -sf /usr/share/zoneinfo/<country>/<city> /etc/localtime```
 
@@ -69,12 +69,12 @@ gpg --list-secret-keys
 
 gpg --list-keys
 ```
->sec   ed25519 2024-09-23 [C] [expires: 2024-09-24]
->      blahblahblahblahblahblahblahblahblahbla
->uid           [ unknown] User Name <user@domain.com>
->ssb   ed25519 2024-09-23 [SC] [expires: 2024-09-24]
->ssb   cv25519 2024-09-23 [E] [expires: 2024-09-24]
->ssb   ed25519 2024-09-23 [A] [expires: 2024-09-24]
+> sec   ed25519 2024-09-23 [C] [expires: 2024-09-24]  
+>       blahblahblahblahblahblahblahblahblahbla  
+> uid           [ unknown] User Name <user@domain.com>  
+> ssb   ed25519 2024-09-23 [SC] [expires: 2024-09-24]  
+> ssb   cv25519 2024-09-23 [E] [expires: 2024-09-24]  
+> ssb   ed25519 2024-09-23 [A] [expires: 2024-09-24]  
 
 
 ## 5. Export the public key and display as a QR Code on the screen
@@ -97,27 +97,27 @@ Note:
 ```
 gpg --card-status
 ```
->Reader ...........: 234B:0000:FSIJ-2.2-3931CF92:0
->Application ID ...: D276000124010200FFFE3931CF920000
->Application type .: OpenPGP
->Version ..........: 2.0
->Manufacturer .....: unmanaged S/N range
->Serial number ....: 3931CF92
->Name of cardholder: [not set]
->Language prefs ...: [not set]
->Salutation .......: 
->URL of public key : [not set]
->Login data .......: [not set]
->Signature PIN ....: forced
->Key attributes ...: ed25519 cv25519 ed25519
->Max. PIN lengths .: 127 127 127
->PIN retry counter : 3 3 3
->Signature counter : 0
->KDF setting ......: off
->Signature key ....: [none]
->Encryption key....: [none]
->Authentication key: [none]
->General key info..: [none]
+> Reader ...........: 234B:0000:FSIJ-2.2-3931CF92:0  
+> Application ID ...: D276000124010200FFFE3931CF920000  
+> Application type .: OpenPGP  
+> Version ..........: 2.0  
+> Manufacturer .....: unmanaged S/N range  
+> Serial number ....: 3931CF92  
+> Name of cardholder: [not set]  
+> Language prefs ...: [not set]  
+> Salutation .......:  
+> URL of public key : [not set]  
+> Login data .......: [not set]  
+> Signature PIN ....: forced  
+> Key attributes ...: ed25519 cv25519 ed25519  
+> Max. PIN lengths .: 127 127 127  
+> PIN retry counter : 3 3 3  
+> Signature counter : 0  
+> KDF setting ......: off  
+> Signature key ....: [none]  
+> Encryption key....: [none]  
+> Authentication key: [none]  
+> General key info..: [none]  
 
 Note: The Gnuk token must not already have keys on it, or if it does then you will need to factory-reset it: ```gpg --card-edit``` then ```gpg/card> admin``` to access admin commands, then ```gpg/card> factory-reset```.
 
@@ -228,36 +228,36 @@ The OpenPGPcard specification has two passwords: user-password and admin-passwor
 ```
 $ gpg --card-edit
 ```
->Reader ...........: 234B:0000:FSIJ-1.2.0-87193059:0
->Application ID ...: D276000124010200FFFE871930590000
->Version ..........: 2.0
->Manufacturer .....: unmanaged S/N range
->Serial number ....: 87193059
->Name of cardholder: [not set]
->Language prefs ...: [not set]
->Salutation .......:
->URL of public key : [not set]
->Login data .......: gniibe
->Signature PIN ....: not forced
->Key attributes ...: ed25519 cv25519 ed25519
->Max. PIN lengths .: 127 127 127
->PIN retry counter : 3 3 3
->Signature counter : 0
->KDF setting ......: single
->UIF setting ......: Sign=off Decrypt=off Auth=off
->Signature key ....: 249C B377 1750 745D 5CDD  323C E267 B052 364F 028D
->      created ....: 2015-08-12 07:10:48
->Encryption key....: E228 AB42 0F73 3B1D 712D  E50C 850A F040 D619 F240
->      created ....: 2015-08-12 07:10:48
->Authentication key: E63F 31E6 F203 20B5 D796  D266 5F91 0521 FAA8 05B1
->      created ....: 2015-08-12 07:16:14
->General key info..: pub  ed25519/E267B052364F028D 2015-08-12 NIIBE Yutaka <gniibe@fsij.org>
->sec>  ed25519/E267B052364F028D  created: 2015-08-12  expires: never
->                                card-no: FFFE 87193059
->ssb>  cv25519/850AF040D619F240  created: 2015-08-12  expires: never
->                                card-no: FFFE 87193059
->ssb>  ed25519/5F910521FAA805B1  created: 2015-08-12  expires: never
->                                card-no: FFFE 87193059
+> Reader ...........: 234B:0000:FSIJ-1.2.0-87193059:0  
+> Application ID ...: D276000124010200FFFE871930590000  
+> Version ..........: 2.0  
+> Manufacturer .....: unmanaged S/N range  
+> Serial number ....: 87193059  
+> Name of cardholder: [not set]  
+> Language prefs ...: [not set]  
+> Salutation .......:  
+> URL of public key : [not set]  
+> Login data .......: gniibe  
+> Signature PIN ....: not forced  
+> Key attributes ...: ed25519 cv25519 ed25519  
+> Max. PIN lengths .: 127 127 127  
+> PIN retry counter : 3 3 3  
+> Signature counter : 0  
+> KDF setting ......: single  
+> UIF setting ......: Sign=off Decrypt=off Auth=off  
+> Signature key ....: 249C B377 1750 745D 5CDD  323C E267 B052 364F 028D  
+>       created ....: 2015-08-12 07:10:48  
+> Encryption key....: E228 AB42 0F73 3B1D 712D  E50C 850A F040 D619 F240  
+>       created ....: 2015-08-12 07:10:48  
+> Authentication key: E63F 31E6 F203 20B5 D796  D266 5F91 0521 FAA8 05B1  
+>       created ....: 2015-08-12 07:16:14  
+> General key info..: pub  ed25519/E267B052364F028D 2015-08-12 NIIBE Yutaka <gniibe@fsij.org>  
+> sec>  ed25519/E267B052364F028D  created: 2015-08-12  expires: never  
+>                                 card-no: FFFE 87193059  
+> ssb>  cv25519/850AF040D619F240  created: 2015-08-12  expires: never  
+>                                 card-no: FFFE 87193059  
+> ssb>  ed25519/5F910521FAA805B1  created: 2015-08-12  expires: never  
+>                                 card-no: FFFE 87193059  
 
 
 ### 9.2 Set user PIN (passphrase)

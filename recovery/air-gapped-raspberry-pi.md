@@ -44,7 +44,7 @@ cd /tmp; \
 wget $raspios_img_link; \
 sha256sum $raspios_img_compressed;
 ```
->43d150e7901583919e4eb1f0fa83fe0363af2d1e9777a5bb707d696d535e2599  2024-07-04-raspios-bookworm-arm64-lite.img.xz
+> 43d150e7901583919e4eb1f0fa83fe0363af2d1e9777a5bb707d696d535e2599  2024-07-04-raspios-bookworm-arm64-lite.img.xz  
 
 Check the sha256sum is the same value as that displayed on the raspberrypi.com download site.
 
@@ -58,13 +58,13 @@ sudo dd bs=4M if=$raspios_img of=$sddev status=progress conv=fsync;
 ```
 Ensure there are no write errors:
 
->676+0 records in
->676+0 records out
->2835349504 bytes (2.8 GB, 2.6 GiB) copied, 51.8909 s, 54.6 MB/s
+> 676+0 records in  
+> 676+0 records out  
+> 2835349504 bytes (2.8 GB, 2.6 GiB) copied, 51.8909 s, 54.6 MB/s  
 
 SD cards have a limited number of write cycles.  If you see an error like:
 
->dd: fsync failed for '/dev/sda': Input/output error
+> dd: fsync failed for '/dev/sda': Input/output error  
 
 Try repeating the step of writing the raspios image to SD card, or find another SD card and try again: ```sudo dd bs=4M if=$raspios_img of=$sddev status=progress conv=fsync;```
 
