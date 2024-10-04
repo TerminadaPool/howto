@@ -2,7 +2,7 @@
 
 Requirements:
 - SD card with at least 16G capacity
-- Raspberry pi: Suggest model 4B or 5.  (These instructions were confirmed to work on both Raspberry pi model 4B and Raspberry pi 5 devices.)
+- Raspberry pi: Suggest model 4B or 5.  (These instructions were confirmed to work on a Raspberry pi model 4B device.)
 
 
 ## 1. Install debootstrap and qemu-system-arm to host machine
@@ -210,17 +210,15 @@ systemctl enable setup-pi-home;
 #### Install required packages
 ```
 apt-get update; \
-apt-get -y install wget curl vim git gnupg scdaemon openssl sudo fake-hwclock dbus acl dbus-user-session libpam-systemd; \
+apt-get -y install wget curl vim git gnupg scdaemon openssl sudo fake-hwclock qrencode; \
 apt-get -y install binutils-arm-none-eabi gcc-arm-none-eabi gdb-multiarch libnewlib-arm-none-eabi picolibc-arm-none-eabi openocd; \
 apt-get -y install cmake build-essential libcrypto++-dev libboost-program-options-dev libboost-math-dev libsodium-dev g++ gcc pkg-config python3; \
 apt-get -y install llvm clang; \
 update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100; \
 update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100;
 ```
-Note:
-- ```apt -y install dbus acl dbus-user-session libpam-systemd``` should enable automatic user ACL management and thereby allow the logged in user (pi) rw access to the USB device associated with the Gnuk token when inserted.
 
-#### Chown /usr/local/src to pi user, clone, build and install requirements
+#### Chown /usr/local/src to pi user, clone required sources, build, and install
 ```
 chown -R pi:pi /usr/local/src; \
 
@@ -260,7 +258,7 @@ cp -v generate_derived_key/generate_derived_key /usr/local/bin/; \
 cp -v extend_key_expiry/extend_key_expiry /usr/local/bin/;
 ```
 
-#### Script to generate random bip39 words using openssl rand function
+#### Install script that can generate random bip39 words using openssl rand function
 ```
 cat << 'END_random_bip39_words' > /usr/local/bin/random-bip39-words;
 #!/bin/bash
@@ -286,26 +284,6 @@ printf '\n'
 END_random_bip39_words
 
 chmod 0755 /usr/local/bin/random-bip39-words;
-```
-
-#### Script to determine USB device by Vendor ID
-```
-cat << 'END_usb_device_by' > /usr/local/bin/usb-device-by;
-#!/bin/bash
-set -euo pipefail
-
-[[ "${1:-}" =~ ^[0-9a-fA-F]+$ ]] || { printf "Error: invalid vendor ID '%s'\n" "${1:-}"; exit 1; }
-
-for d in /sys/bus/usb/devices/*; do
-  if [ "$1" == "$(cat "${d}/idVendor" 2>/dev/null)" ]; then
-    busnum="$(cat "${d}/busnum")"
-    devnum="$(cat "${d}/devnum")"
-    printf 'Device: /dev/bus/usb/%03i/%03i\n' "$busnum" "$devnum"
-  fi
-done
-END_usb_device_by
-
-chmod 0755 /usr/local/bin/usb-device-by;
 ```
 
 ### 7.11 Exit the chroot
