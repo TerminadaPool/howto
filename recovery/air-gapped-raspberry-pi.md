@@ -1,7 +1,7 @@
 # Air-gapped raspberry pi
 
 Requirements:
-- SD card with at least 16G capacity
+- SD card with at least 8G capacity (Nb: 94% usage of 8G capacity SD card.)
 - Raspberry pi: Suggest model 4B or 5.  (These instructions were confirmed to work on a Raspberry pi model 4B device.)
 
 
@@ -99,18 +99,40 @@ Notes:
 - Remove init=/usr/lib/raspberrypi-sys-mods/firstboot parameter from cmdline.txt file.  Post removal cmdline.txt looks like 'console=serial0,115200 console=tty1 root=PARTUUID=a3f161f3-02 rootfstype=ext4 fsck.repair=yes rootwait quiet'.  When the init= parameter is omitted the kernel will run /sbin/init.
 
 
-## 6. Expand raspios root partition and debootstrap a new Debian system
+## 6. Expand raspios root and debootstrap new Debian system
+
+### 6.1 Expand raspios root partition and mount
 ```
-sd_p2_dev=$(lsblk -n -o NAME --sort NAME --paths $sddev | sed -n '3{p;q}');
+sd_p2_dev=$(lsblk -n -o NAME --sort NAME --paths $sddev | sed -n '3{p;q}'); \
 
 sudo parted --script $sddev \
   resizepart 2 100%; \
 
-sudo mkfs.ext4 -F $sd_p2_dev; \
+sudo resize2fs $sd_p2_dev; \
+sudo e2fsck -fp $sd_p2_dev; \
 
 raspios_root=$(mktemp -d -t raspios_root-XXXXXXXX); \
-sudo mount $sd_p2_dev $raspios_root; \
+sudo mount $sd_p2_dev $raspios_root;
+```
 
+### 6.2 Delete everything on raspios root but keep /usr/lib/modules
+```
+(
+if cd ${raspios_root}; then \
+  delete_list=$(ls); \
+  sudo mv usr/lib/modules _saved_modules; \
+  for dir in ${delete_list}; do \
+    sudo rm -rf ${dir}; \
+  done; \
+  sudo mkdir -p usr/lib; \
+  sudo mv _saved_modules usr/lib/modules; \
+  sudo ln -s usr/lib lib; \
+fi;
+)
+```
+
+### 6.3 debootstrap new Debian system
+```
 debdist=bookworm; \
 
 sudo debootstrap --arch=arm64 $debdist $raspios_root http://deb.debian.org/debian/;
@@ -180,7 +202,7 @@ passwd pi;
 cat << END_fstab > /etc/fstab;
 /dev/mmcblk0p1 /boot vfat errors=remount-ro,umask=0027,fmask=0077,uid=0,gid=0 0 2
 /dev/mmcblk0p2 / ext4 noatime,nodiratime 0 1
-tmpfs /home tmpfs nodev,nosuid,noexec,size=64M,uid=pi,gid=pi,mode=0700 0 0
+tmpfs /home tmpfs size=64M,uid=pi,gid=pi,mode=0700 0 0
 END_fstab
 ```
 Nb: Entire home directory will reside on tmpfs RAM filesystem.
@@ -210,7 +232,9 @@ systemctl enable setup-pi-home;
 #### Install required packages
 ```
 apt-get update; \
-apt-get -y install wget curl vim git gnupg scdaemon openssl sudo fake-hwclock qrencode; \
+apt-get -y install ca-certificates; \
+apt-get update; \
+apt-get -y install wget curl vim git gnupg scdaemon openssl sudo fake-hwclock qrencode cryptsetup lvm2 dosfstools; \
 apt-get -y install binutils-arm-none-eabi gcc-arm-none-eabi gdb-multiarch libnewlib-arm-none-eabi picolibc-arm-none-eabi openocd; \
 apt-get -y install cmake build-essential libcrypto++-dev libboost-program-options-dev libboost-math-dev libsodium-dev g++ gcc pkg-config python3; \
 apt-get -y install llvm clang; \
